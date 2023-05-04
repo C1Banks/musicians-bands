@@ -5,12 +5,16 @@ describe('Band, Musician, and Song Models', () => {
     /**
      * Runs the code prior to all tests
      */
+    
     beforeAll(async () => {
+       
         // the 'sync' method will create tables based on the model class
         // by setting 'force:true' the tables are recreated each time the 
         // test suite is run
         await sequelize.sync({ force: true });
     })
+
+    
 
     test('can create a Band', async () => {
         const testBand = await Band.create({ name: 'AC/DC', genre: 'Rock' });
@@ -68,4 +72,33 @@ describe('Band, Musician, and Song Models', () => {
         let deletedSong1 = await Song.findByPk(1);
         expect(deletedSong1).toBe(null);
         }) 
+
+        
+
+    test('bands can have multiple musicians', async () => {
+      
+        
+
+        await Band.create({name:"Lumineers", genre: "Pop"});
+        await Band.create({name:"Jackson Five", genre: "Pop"});
+        await Band.create({name:"Silk Sonic", genre: "R&B"});
+        
+         await Musician.create({name: "John Legend", instrument: "Singer"})
+         await Musician.create({name: "Micheal Jackson", instrument: "Singer"})
+         await Musician.create({name: "Bruno Marz", instrument: "Singer"})
+
+        const bandWithMusicians = Band.findByPk(0, {include: Musician});
+        
+
+         //await bands[1].addMusician(musicians[1]);
+         //await bands[2].addMusician(musicians[2]);
+         const bands = await Band.findAll();
+         console.log(bandWithMusicians.Musicians[0]);
+         const musicians = await Musician.findAll();
+         const songs = await Song.findAll();
+
+         await bands[0].addMusician(musicians[0], musicians[1], musicians[2]);
+
+        expect(bandWithMusicians.Musicians[0]).toHaveProperty("name", "Micheal Jackson");
+    })
 })
